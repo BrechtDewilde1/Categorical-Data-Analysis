@@ -19,14 +19,14 @@ greater_than_x(0:20, n = 20, pi = 0.87)
 # CI 
 # install.packages('binom')
 library(binom)
-binom.confint(x = 20, n = 20, conf.level = 0.05, method = 'exact')
+binom.confint(x = 20, n = 20, conf.level = 0.95, method = 'exact')
 
 # (b)coverage probability for a 95% confidence interval for pi (n=20, population pi = 0.87) 
 # (1) a Clopper-Pearson exact interval
 binomial_probs_of_samples_containing_pi <- rep(0, n)
 for(i in 0:n){
-  ucl = binom.confint(x = i, n = 20, conf.level = 0.05, method = 'exact')$upper
-  lcl = binom.confint(x = i, n = 20, conf.level = 0.05, method = 'exact')$lower
+  ucl = binom.confint(x = i, n = 20, conf.level = 0.95, method = 'exact')$upper
+  lcl = binom.confint(x = i, n = 20, conf.level = 0.95, method = 'exact')$lower
   if (lcl <= pi && pi <= ucl){
     binomial_probs_of_samples_containing_pi[i] <- dbinom(i, size = n, prob = pi)
   }
@@ -36,8 +36,8 @@ sum(binomial_probs_of_samples_containing_pi)
 # (2) a Wald interval
 binomial_probs_of_samples_containing_pi <- rep(0, n)
 for(i in 0:n){
-  ucl = binom.confint(x = i, n = 20, conf.level = 0.05, method = 'asymptotic')$upper
-  lcl = binom.confint(x = i, n = 20, conf.level = 0.05, method = 'asymptotic')$lower
+  ucl = binom.confint(x = i, n = 20, conf.level = 0.95, method = 'asymptotic')$upper
+  lcl = binom.confint(x = i, n = 20, conf.level = 0.95, method = 'asymptotic')$lower
   if (lcl <= pi && pi <= ucl){
     binomial_probs_of_samples_containing_pi[i] <- dbinom(i, size = n, prob = pi)
   }
@@ -51,7 +51,6 @@ sum(binomial_probs_of_samples_containing_pi)
 ##############################
 tutor.matrix <- matrix( c(5, 10, 5, 30), ncol=2, 
                           dimnames=list(Support=c("Tutor support","No support"), Successful=c("Yes","No")))
-barplot(tutor.matrix, beside = TRUE)
 proportion_tutor_support <- sum(tutor.matrix[1,1]) / sum(tutor.matrix[1,])
 proportion_no_support <- sum(tutor.matrix[2,1]) / sum(tutor.matrix[2,])
 
@@ -59,17 +58,8 @@ proportion_no_support <- sum(tutor.matrix[2,1]) / sum(tutor.matrix[2,])
 # H0: tutor_support = no_support
 # A: tutor_support > no support
 
-# Note that, by default, the function prop.test() used the Yates continuity correction, 
-# which is really important if either the expected successes or failures is < 5. None are less than 5
 test <- prop.test(tutor.matrix, correct = FALSE, alternative = 'greater')
+test$estimate # estimated probability of success
+test$conf.int # the confidence interval for the probability of success
+test$p.value  # the p-value of the test
 
-# estimated probability of success
-test$estimate
-
-# the confidence interval for the probability of success
-test$conf.int
-
-# the p-value of the test
-test$p.value # as the p value of the test is higher than the significande level alpha = 0.05 
-# we can conclude that the proportion of people that succeeded is not significantly different in the
-# two groups with a p-value of ... 
